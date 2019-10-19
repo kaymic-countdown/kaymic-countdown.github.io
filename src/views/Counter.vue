@@ -43,13 +43,24 @@
         </div>
       </div>
 
-      <em class="text-muted d-block mt-5">
-        {{ hasPast ? 'since' : 'until' }}
-      </em>
 
-      <span class="lead text-light">
-        {{ date.format('LLLL') }}
-      </span>
+      <div class="text-light lead">
+        <em class="text-muted d-block mt-5">
+          {{ hasPast ? 'since' : 'until' }}
+        </em>
+
+        <span v-if="$route.query.name" class="h1 d-block">
+          {{ $route.query.name }}
+        </span>
+
+        <span v-if="$route.query.name">
+          on
+        </span>
+
+        <small>
+          {{ date.format('LLLL') }}
+        </small>
+      </div>
     </div>
 
   </div>
@@ -60,9 +71,11 @@ import moment from 'moment'
 
 export default {
   mounted() {
+    this.updateTimes()
     setInterval(this.updateTimes, 1000)
   },
   data: () => ({
+    hasPast: false,
     years: 0,
     months: 0,
     days: 0,
@@ -82,13 +95,11 @@ export default {
       s = this.$route.params.second || '00'
 
       return moment(`${y}-${m}-${d} ${h}:${mi}:${s}`, 'YYYY-MM-DD hh:mm:ss')
-    },
-    hasPast() {
-      return moment().isAfter(this.date)
     }
   },
   methods: {
     updateTimes() {
+      this.hasPast = moment().isAfter(this.date)
       let duration = moment.duration( this.hasPast ? moment().diff(this.date) : this.date.diff(moment()) )
 
       this.years = duration.years()
